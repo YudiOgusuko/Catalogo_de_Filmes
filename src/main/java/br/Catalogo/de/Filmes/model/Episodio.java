@@ -17,7 +17,7 @@ public class Episodio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String tituloSerie;
+    @Column(unique = true)
     private String tituloEpisodio;
     private String duracao;
     private Integer temporada;
@@ -27,8 +27,15 @@ public class Episodio {
     private String ano;
     private String poster;
 
-    public Episodio (String serie, SerieEpisodioDto serieEpisodioDto) {
-        this.tituloSerie = serie;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "serie_id")
+    private Serie serie;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "temporada_id")
+    private Temporadas temporadas;
+
+    public Episodio (SerieEpisodioDto serieEpisodioDto) {
         this.tituloEpisodio = serieEpisodioDto.titulo();
         this.duracao = serieEpisodioDto.duracao();
         this.temporada = serieEpisodioDto.temporada();

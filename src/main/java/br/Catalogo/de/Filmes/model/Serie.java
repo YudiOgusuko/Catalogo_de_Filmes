@@ -1,8 +1,11 @@
 package br.Catalogo.de.Filmes.model;
 
 import br.Catalogo.de.Filmes.dto.SerieDto;
+import br.Catalogo.de.Filmes.handler.exception.NotFoundException;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.*;
 
 @Entity
 @Table(name = "tb_series")
@@ -17,7 +20,9 @@ public class Serie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String titulo;
+
     private String ano;
     private String genero;
     private String diretor;
@@ -26,6 +31,12 @@ public class Serie {
     private String poster;
     private Double avaliacao;
     private Integer temporadas;
+
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL)
+    private List<Temporadas> temporadasList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL)
+    private List<Episodio> episodiosList = new ArrayList<>();
 
     public Serie(SerieDto serieDto) {
         this.titulo = serieDto.titulo();
@@ -38,5 +49,23 @@ public class Serie {
         this.avaliacao = serieDto.avaliacao();
         this.temporadas = serieDto.temporadas();
 
+    }
+
+    public void buscarTemporada(Temporadas temporadas) {
+        temporadas.setSerie(this);
+        this.getTemporadasList().add(temporadas);
+    }
+
+    public void buscarEpisodio(Integer numeroTemporada, Episodio episodio) {
+        Temporadas temporadaExistente = this.getTemporadasList().stream()
+                        .filter(t -> t.getTemporada().equals(numeroTemporada))
+                                .findFirst()
+                                        .orElseThrow(() -> new NotFoundException("Temporada não encontrada."));
+
+        episodio.setSerie(this);
+        this.getEpisodiosList().add(episodio);
+
+        episodio.setTemporadas(temporadaExistente);
+        temporadaExistente.getEpisodioList().add(episodio);
     }
 }
