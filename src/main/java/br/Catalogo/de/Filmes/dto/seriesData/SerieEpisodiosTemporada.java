@@ -9,5 +9,5 @@ import lombok.Builder;
 public record SerieEpisodiosTemporada(@JsonProperty("Title") String titulo,
                                       @JsonProperty("Released") String ano,
                                       @JsonProperty("Episode") Integer episodio,
-                                      @JsonProperty("imdbRating") Double avaliacao) {
+                                      @JsonProperty("imdbRating") String avaliacao) {
 }

@@ -2,8 +2,9 @@ package br.Catalogo.de.Filmes.dto;
 
 import br.Catalogo.de.Filmes.dto.filmeDados.FilmeDados;
 import br.Catalogo.de.Filmes.model.Filme;
+import br.Catalogo.de.Filmes.model.Genero;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.*;
+import lombok.Builder;
 
 @Builder
 @JsonPropertyOrder({
@@ -26,17 +27,17 @@ public record FilmeDto(String titulo,
                      String atores,
                      String trama,
                      String poster,
-                     Double avaliacao){
+                     String avaliacao){
 
-    public FilmeDto (FilmeDados filmeDados) {
+    public FilmeDto (FilmeDados filmeDados, String genero) {
         this(filmeDados.titulo(), filmeDados.ano(), filmeDados.duracao(),
-                filmeDados.genero(), filmeDados.diretor(), filmeDados.atores(),
+                genero, filmeDados.diretor(), filmeDados.atores(),
                 filmeDados.trama(), filmeDados.poster(), filmeDados.avaliacao());
     }
 
     public FilmeDto (Filme filme) {
         this(filme.getTitulo(), filme.getAno(), filme.getDuracao(),
-                filme.getGenero(), filme.getDiretor(), filme.getAtores(),
-                filme.getTrama(), filme.getPoster(), filme.getAvaliacao());
+               Genero.pegarGeneroString(filme.getGenero()), filme.getDiretor(), filme.getAtores(),
+                      filme.getTrama(), filme.getPoster(), filme.getAvaliacao());
     }
 }

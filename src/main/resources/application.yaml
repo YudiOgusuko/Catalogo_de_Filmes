@@ -21,3 +21,8 @@ omdb:
   api:
     key: ${OMDB_API_KEY}
     url: "https://www.omdbapi.com/?apikey="
+
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY}

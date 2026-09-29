@@ -14,5 +14,5 @@ public record FilmeDados(@JsonProperty("Title") String titulo,
                          @JsonProperty("Actors") String atores,
                          @JsonProperty("Plot") String trama,
                          @JsonProperty("Poster") String poster,
-                         @JsonProperty("imdbRating") Double avaliacao) {
+                         @JsonProperty("imdbRating") String avaliacao) {
 }

@@ -1,6 +1,7 @@
 package br.Catalogo.de.Filmes.dto;
 
 import br.Catalogo.de.Filmes.dto.seriesData.SerieDados;
+import br.Catalogo.de.Filmes.model.Genero;
 import br.Catalogo.de.Filmes.model.Serie;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
@@ -25,17 +26,17 @@ public record SerieDto(String titulo,
                        String atores,
                        String trama,
                        String poster,
-                       Double avaliacao,
+                       String avaliacao,
                        Integer temporadas) {
 
-    public SerieDto(SerieDados serieDados) {
-        this(serieDados.titulo(), serieDados.ano(), serieDados.genero(),
+    public SerieDto(SerieDados serieDados, String genero) {
+        this(serieDados.titulo(), serieDados.ano(), genero,
                 serieDados.diretor(), serieDados.atores(), serieDados.trama(),
                 serieDados.poster(), serieDados.avaliacao(), serieDados.temporadas());
     }
 
     public SerieDto(Serie serie) {
-        this(serie.getTitulo(), serie.getAno(), serie.getGenero(),
+        this(serie.getTitulo(), serie.getAno(), Genero.pegarGeneroString(serie.getGenero()),
                 serie.getDiretor(), serie.getAtores(), serie.getTrama(),
                 serie.getPoster(), serie.getAvaliacao(), serie.getTemporadas());
     }

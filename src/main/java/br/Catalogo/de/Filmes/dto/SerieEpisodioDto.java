@@ -22,7 +22,7 @@ public record SerieEpisodioDto(String titulo,
                               String duracao,
                               String descricao,
                               String poster,
-                              Double avaliacao) {
+                              String avaliacao) {
 
     public SerieEpisodioDto (SerieEpisodios serieEpisodios) {
         this(serieEpisodios.titulo(), serieEpisodios.ano(), serieEpisodios.temporada(),

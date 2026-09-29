@@ -39,7 +39,7 @@ public class SerieController {
     }
 
     @GetMapping("/pegarTemporada")
-    public ResponseEntity<SerieTemporadaDto> pegarTemporada(
+    public ResponseEntity<SerieTemporadaDto> buscarTemporada(
             @RequestParam
             @NotEmpty(message = "O nome da série não pode estar vazia.")
             @Size(max = 74, message = "O nome da série pode ter no máximo, 74 caracteres.")
@@ -50,11 +50,11 @@ public class SerieController {
             @Positive(message = "O número deve ser positivo.")
             @Max(value = 60, message = "O número máximo de temporada é 60")
             Integer temporada) {
-        return ResponseEntity.ok().body(service.pegarTemporada(serie, temporada));
+        return ResponseEntity.ok().body(service.buscarTemporada(serie, temporada));
     }
 
     @GetMapping("/pegarEpisodio")
-    public ResponseEntity<SerieEpisodioDto> pegarEpisodio(
+    public ResponseEntity<SerieEpisodioDto> buscarEpisodio(
             @RequestParam
             @NotEmpty(message = "O nome da série não pode estar vazia.")
             @Size(max = 74, message = "O nome da série pode ter no máximo, 74 caracteres.")
@@ -71,16 +71,16 @@ public class SerieController {
             @Positive(message = "O número deve ser positivo.")
             @Max(value = 195, message = "O número máximo de episódios é 195.")
             Integer episodio) {
-        return ResponseEntity.ok().body(service.pegarEpisodio(serie, temporada, episodio));
+        return ResponseEntity.ok().body(service.buscarEpisodio(serie, temporada, episodio));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<SerieDto>> verTodosFilmes() {
+    public ResponseEntity<List<SerieDto>> verTodosSeries() {
         return ResponseEntity.ok().body(service.verTodasSeries());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<SerieDto> adicionarFilme(
+    public ResponseEntity<SerieDto> adicionarSerie(
             @RequestParam
             @NotEmpty(message = "O nome do filme não pode esta vazia.")
             @Size(max = 41, message = "O nome do filme não pode ultrapassar 41 caracteres.")
@@ -89,7 +89,7 @@ public class SerieController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deletarFilme(
+    public ResponseEntity<String> deletarSerie(
             @RequestParam
             @NotEmpty(message = "O nome do filme não pode esta vazia.")
             @Size(max = 41, message = "O nome do filme não pode ultrapassar 41 caracteres.")
@@ -98,7 +98,7 @@ public class SerieController {
     }
 
     @DeleteMapping("/deleteAll")
-    public ResponseEntity<String> deletarTodosFilmes() {
+    public ResponseEntity<String> deletarTodosSeries() {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(service.deletarTodasSeries());
     }
 }

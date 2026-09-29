@@ -6,16 +6,16 @@ import lombok.Builder;
 
 @Builder
 @JsonPropertyOrder({
-        "tituloEpisodio",
+        "titulo",
         "episodio",
         "avaliacao",
         "anoEpisodio"
 })
 
-public record SerieEpisodiosTemporadaDto(String tituloEpisodio,
+public record SerieEpisodiosTemporadaDto(String titulo,
                                          String anoEpisodio,
                                          Integer episodio,
-                                         Double avaliacao) {
+                                         String avaliacao) {
 
     public SerieEpisodiosTemporadaDto(SerieEpisodiosTemporada serieEpisodiosTemporada) {
         this(serieEpisodiosTemporada.titulo(), serieEpisodiosTemporada.ano(),

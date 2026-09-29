@@ -8,20 +8,31 @@ import java.util.List;
 
 @Builder
 @JsonPropertyOrder({
-        "tituloSerie",
         "temporada",
         "anoTemporada",
         "episodios"
 })
-public record SerieTemporadaDto(String tituloSerie,
-                                Integer temporada,
+public record SerieTemporadaDto(Integer temporada,
                                 Integer anoTemporada,
                                 List<SerieEpisodiosTemporadaDto> episodios) {
 
     public SerieTemporadaDto(SerieTemporadas serieTemporadas) {
-        this(serieTemporadas.titulo(),
-             serieTemporadas.temporada(),
-             Integer.parseInt(serieTemporadas.serieEpisodioPorTemporadas().get(0).ano().substring(0, 4)),
+        this(serieTemporadas.temporada(),
+              extrairAno(serieTemporadas),
               serieTemporadas.serieEpisodioPorTemporadas().stream().map(SerieEpisodiosTemporadaDto::new).toList());
     }
+
+    private static Integer extrairAno(SerieTemporadas serieTemporadas) {
+        if (serieTemporadas.serieEpisodioPorTemporadas() == null || serieTemporadas.serieEpisodioPorTemporadas().isEmpty()) {
+            return null;
+        }
+
+        String ano = serieTemporadas.serieEpisodioPorTemporadas().get(0).ano();
+
+        if (ano == null || ano.isBlank() || ano.equalsIgnoreCase("N/A")) {
+            return null;
+        }
+        return Integer.parseInt(ano.trim().substring(0, 4));
+    }
+
 }

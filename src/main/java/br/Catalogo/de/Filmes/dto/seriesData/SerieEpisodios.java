@@ -13,5 +13,5 @@ public record SerieEpisodios(@JsonProperty("Title") String titulo,
                              @JsonProperty("Runtime") String duracao,
                              @JsonProperty("Plot") String descricao,
                              @JsonProperty("Poster") String poster,
-                             @JsonProperty("imdbRating") Double avaliacao) {
+                             @JsonProperty("imdbRating") String avaliacao) {
 }
