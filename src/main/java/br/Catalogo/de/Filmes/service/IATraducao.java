@@ -35,18 +35,17 @@ public class IATraducao {
        return Client.builder().apiKey(apiKey).build();
     }
 
-
     public static Map<String, String> traduzir(Map<String, String> dados) {
 
-        Map<String, String> dadosparaTraduzir = new LinkedHashMap<>();
+        Map<String, String> dadosParaTraduzir = new LinkedHashMap<>();
 
         dados.forEach((chave, valor) -> {
             if(valor != null && !valor.isBlank() && !valor.equals("N/A")) {
-                dadosparaTraduzir.put(chave, valor);
+                dadosParaTraduzir.put(chave, valor);
             }
         });
 
-        if(dadosparaTraduzir.isEmpty()) {
+        if(dadosParaTraduzir.isEmpty()) {
             return dados;
         }
 
@@ -55,7 +54,7 @@ public class IATraducao {
                 Mantenha as chaves exatamente iguais.
                 Não traduza nomes próprios.
                 Responda somente com o JSON, sem explicações.
-                """ + MAPPER.writeValueAsString(dadosparaTraduzir);
+                """ + MAPPER.writeValueAsString(dadosParaTraduzir);
 
         GenerateContentConfig config = GenerateContentConfig.builder()
                 .responseMimeType("application/json")

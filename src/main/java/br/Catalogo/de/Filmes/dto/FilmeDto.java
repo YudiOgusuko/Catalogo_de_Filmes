@@ -1,8 +1,8 @@
 package br.Catalogo.de.Filmes.dto;
 
 import br.Catalogo.de.Filmes.dto.filmeDados.FilmeDados;
+import br.Catalogo.de.Filmes.enums.Genero;
 import br.Catalogo.de.Filmes.model.Filme;
-import br.Catalogo.de.Filmes.model.Genero;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 
@@ -20,14 +20,14 @@ import lombok.Builder;
 })
 
 public record FilmeDto(String titulo,
-                     Integer ano,
-                     String duracao,
-                     String genero,
-                     String diretor,
-                     String atores,
-                     String trama,
-                     String poster,
-                     String avaliacao){
+                       Integer ano,
+                       String duracao,
+                       String genero,
+                       String diretor,
+                       String atores,
+                       String trama,
+                       String poster,
+                       String avaliacao){
 
     public FilmeDto (FilmeDados filmeDados, String genero) {
         this(filmeDados.titulo(), filmeDados.ano(), filmeDados.duracao(),

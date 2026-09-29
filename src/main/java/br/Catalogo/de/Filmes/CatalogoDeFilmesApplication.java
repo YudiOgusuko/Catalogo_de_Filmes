@@ -13,5 +13,4 @@ public class CatalogoDeFilmesApplication {
 				System.setProperty(d.getKey(), d.getValue()));
 		SpringApplication.run(CatalogoDeFilmesApplication.class, args);
 	}
-
 }

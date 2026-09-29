@@ -1,6 +1,7 @@
 package br.Catalogo.de.Filmes.model;
 
 import br.Catalogo.de.Filmes.dto.FilmeDto;
+import br.Catalogo.de.Filmes.enums.Genero;
 import jakarta.persistence.*;
 import lombok.*;
 

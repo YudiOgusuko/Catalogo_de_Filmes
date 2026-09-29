@@ -1,7 +1,7 @@
 package br.Catalogo.de.Filmes.dto;
 
 import br.Catalogo.de.Filmes.dto.seriesData.SerieDados;
-import br.Catalogo.de.Filmes.model.Genero;
+import br.Catalogo.de.Filmes.enums.Genero;
 import br.Catalogo.de.Filmes.model.Serie;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;

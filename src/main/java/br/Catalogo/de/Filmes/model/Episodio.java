@@ -33,7 +33,7 @@ public class Episodio {
 
     public Episodio (SerieEpisodiosTemporadaDto serieEpisodioDto) {
         this.tituloEpisodio = serieEpisodioDto.titulo();
-        this.ano = serieEpisodioDto.anoEpisodio();
+        this.ano = serieEpisodioDto.dataLancamento();
         this.episodio = serieEpisodioDto.episodio();
         this.avaliacao = serieEpisodioDto.avaliacao();
     }

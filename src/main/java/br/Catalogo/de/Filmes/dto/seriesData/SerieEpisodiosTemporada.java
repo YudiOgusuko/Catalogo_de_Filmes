@@ -7,7 +7,7 @@ import lombok.Builder;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record SerieEpisodiosTemporada(@JsonProperty("Title") String titulo,
-                                      @JsonProperty("Released") String ano,
+                                      @JsonProperty("Released") String dataLancamento,
                                       @JsonProperty("Episode") Integer episodio,
                                       @JsonProperty("imdbRating") String avaliacao) {
 }

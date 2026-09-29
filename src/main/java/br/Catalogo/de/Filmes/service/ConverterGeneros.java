@@ -1,11 +1,12 @@
 package br.Catalogo.de.Filmes.service;
 
-import br.Catalogo.de.Filmes.model.Genero;
+import br.Catalogo.de.Filmes.enums.Genero;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class ConverterGeneros implements AttributeConverter<Genero, String> {
+
     @Override
     public String convertToDatabaseColumn(Genero attribute) {
         if(attribute == null) {

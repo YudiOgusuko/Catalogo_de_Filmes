@@ -1,6 +1,7 @@
 package br.Catalogo.de.Filmes.model;
 
 import br.Catalogo.de.Filmes.dto.SerieDto;
+import br.Catalogo.de.Filmes.enums.Genero;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -41,19 +42,6 @@ public class Serie {
         this.titulo = serieDto.titulo();
         this.ano = serieDto.ano();
         this.genero = genero;
-        this.diretor = serieDto.diretor();
-        this.atores = serieDto.atores();
-        this.trama = serieDto.trama();
-        this.poster = serieDto.poster();
-        this.avaliacao = serieDto.avaliacao();
-        this.temporadas = serieDto.temporadas();
-
-    }
-
-    public Serie(SerieDto serieDto) {
-        this.titulo = serieDto.titulo();
-        this.ano = serieDto.ano();
-        this.genero = Genero.pegarGenero(serieDto.genero());
         this.diretor = serieDto.diretor();
         this.atores = serieDto.atores();
         this.trama = serieDto.trama();

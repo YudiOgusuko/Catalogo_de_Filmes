@@ -3,10 +3,10 @@ package br.Catalogo.de.Filmes.service;
 import br.Catalogo.de.Filmes.dto.FilmeDto;
 import br.Catalogo.de.Filmes.dto.conteudosDados.ConteudoSearchDados;
 import br.Catalogo.de.Filmes.dto.filmeDados.FilmeDados;
+import br.Catalogo.de.Filmes.enums.Genero;
 import br.Catalogo.de.Filmes.handler.exception.BadRequestException;
 import br.Catalogo.de.Filmes.handler.exception.NotFoundException;
 import br.Catalogo.de.Filmes.model.Filme;
-import br.Catalogo.de.Filmes.model.Genero;
 import br.Catalogo.de.Filmes.repository.IFilmeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +39,7 @@ public class FilmeService {
             String url = String.format("%s%s&s=%s%s", apiUrl, apiKey, tituloFilme, "&type=movie");
             ConteudoSearchDados conteudoSearchDados = restTemplate.getForObject(url, ConteudoSearchDados.class);
 
-            if(conteudoSearchDados == null || VerificarCampos.todosCamposNull(conteudoSearchDados)) {
+            if(conteudoSearchDados == null || Utilitarios.verificarCamposNull(conteudoSearchDados)) {
                 throw new NotFoundException(String.format("Nenhum dado do filme '%s' foi encontrado", tituloFilme));
             }
 
@@ -55,37 +55,36 @@ public class FilmeService {
         tituloFilme = formatarString(tituloFilme);
 
         Optional<Filme> filmeNoBanco = filmeRepository.findByTituloIgnoreCase(tituloFilme);
-        if(filmeNoBanco.isPresent()) {return new FilmeDto(filmeNoBanco.get());}
+        if (filmeNoBanco.isPresent()) {
+            return new FilmeDto(filmeNoBanco.get());
+        }
+        return buscarFilmesNaApi(tituloFilme);
+    }
 
-        try {
+    public FilmeDto buscarFilmesNaApi(String tituloFilme) {
+
             String url = String.format("%s%s&t=%s%s", apiUrl, apiKey, tituloFilme, "&type=movie");
             FilmeDados filmeDados = restTemplate.getForObject(url, FilmeDados.class);
 
-            if(filmeDados == null || VerificarCampos.todosCamposNull(filmeDados)) {
+            if(filmeDados == null || Utilitarios.verificarCamposNull(filmeDados)) {
                 throw new NotFoundException(String.format("Nenhum dado do filme '%s' foi encontrado", tituloFilme));
             }
 
             String genero = filmeDados.genero().split(",")[0].trim();
 
             return new FilmeDto(filmeDados, Genero.pegarStringGenero(genero));
-
-        } catch (HandlerMethodValidationException e) {
-            throw new BadRequestException(e.getMessage());
-        }
     }
-
 
     public FilmeDto adicionarFilme(String tituloFilme) {
 
         tituloFilme = formatarString(tituloFilme);
 
-        Optional<Filme> filmeOptional = filmeRepository.findByTituloIgnoreCase(tituloFilme);
-        if(filmeOptional.isPresent()) {
-            throw new BadRequestException(String.format("O filme %s ja foi adicionado.", tituloFilme));
+        if(filmeRepository.existsByTituloIgnoreCase(tituloFilme)) {
+            throw new BadRequestException(String.format("O filme '%s' ja foi adicionado.", tituloFilme));
         }
 
         try {
-            FilmeDto filmeDto = buscarFilmes(tituloFilme);
+            FilmeDto filmeDto = buscarFilmesNaApi(tituloFilme);
 
             String trama = "N/A";
             if(!filmeDto.trama().equalsIgnoreCase("N/A")) {
@@ -94,35 +93,36 @@ public class FilmeService {
                         .get("trama");
             }
 
-            filmeRepository.save(new Filme(filmeDto, Genero.pegarGenero(filmeDto.genero()), trama));
+            Filme filme = new Filme(filmeDto, Genero.pegarGenero(filmeDto.genero()), trama);
+
+            filmeRepository.save(filme);
             return filmeDto;
+
         } catch (HandlerMethodValidationException e) {
             throw new BadRequestException(e.getMessage());
         }
     }
 
+    public String deletarFilme(String tituloFilme) {
 
-    public String deletarFilme(String filme) {
+        String titulo = formatarString(tituloFilme);
 
-        Filme filmeParaDeletar = filmeRepository.findByTituloIgnoreCase(filme)
-                .orElseThrow(() -> new NotFoundException(String.format("O filme %s não está no catálogo.", filme)));
+        Filme filmeParaDeletar = filmeRepository.findByTituloIgnoreCase(titulo)
+                .orElseThrow(() -> new NotFoundException(String.format("O filme %s não está no catálogo.", titulo)));
 
         filmeRepository.delete(filmeParaDeletar);
 
-        return String.format("O filme %s foi deletado do catálogo.", filme);
+        return String.format("O filme %s foi deletado do catálogo.", titulo);
     }
-
 
     public String deletarTodosFilmes() {
         filmeRepository.deleteAll();
         return "Todos os filmes foram deletados do catálogo.";
     }
 
-
     public List<FilmeDto> verTodosFilmes() {
         return filmeRepository.findAll().stream().map(FilmeDto::new).toList();
     }
-
 
     private String formatarString(String txt) {
         if(txt == null || txt.isBlank()) {
@@ -140,7 +140,6 @@ public class FilmeService {
                 stringBuilder.append(formatar).append(" ");
             }
         }
-
         return stringBuilder.toString().trim();
     }
 }

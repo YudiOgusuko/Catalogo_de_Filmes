@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface IFilmeRepository extends JpaRepository<Filme, Long> {
 
     Optional<Filme> findByTituloIgnoreCase(String filme);
+
+    boolean existsByTituloIgnoreCase(String tituloFilme);
 }

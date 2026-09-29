@@ -10,7 +10,7 @@ import java.util.List;
 @JsonPropertyOrder({
         "temporada",
         "anoTemporada",
-        "episodios"
+        "episódios"
 })
 public record SerieTemporadaDto(Integer temporada,
                                 Integer anoTemporada,
@@ -27,7 +27,7 @@ public record SerieTemporadaDto(Integer temporada,
             return null;
         }
 
-        String ano = serieTemporadas.serieEpisodioPorTemporadas().get(0).ano();
+        String ano = serieTemporadas.serieEpisodioPorTemporadas().get(0).dataLancamento();
 
         if (ano == null || ano.isBlank() || ano.equalsIgnoreCase("N/A")) {
             return null;

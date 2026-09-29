@@ -1,6 +1,7 @@
 package br.Catalogo.de.Filmes.dto;
 
 import br.Catalogo.de.Filmes.dto.seriesData.SerieEpisodios;
+import br.Catalogo.de.Filmes.service.Utilitarios;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 
@@ -12,11 +13,11 @@ import lombok.Builder;
         "episodio",
         "descricao",
         "avaliacao",
-        "ano",
+        "data",
         "poster"
 })
 public record SerieEpisodioDto(String titulo,
-                              String ano,
+                               String data,
                               Integer temporada,
                               Integer episodio,
                               String duracao,
@@ -24,10 +25,10 @@ public record SerieEpisodioDto(String titulo,
                               String poster,
                               String avaliacao) {
 
-    public SerieEpisodioDto (SerieEpisodios serieEpisodios) {
-        this(serieEpisodios.titulo(), serieEpisodios.ano(), serieEpisodios.temporada(),
+    public SerieEpisodioDto (SerieEpisodios serieEpisodios, String descricao) {
+        this(serieEpisodios.titulo(), Utilitarios.formatarDataEpisodio(serieEpisodios.data()), serieEpisodios.temporada(),
                 serieEpisodios.episodio(), serieEpisodios.duracao(),
-                serieEpisodios.descricao(), serieEpisodios.poster(), serieEpisodios.avaliacao());
+                descricao, serieEpisodios.poster(), serieEpisodios.avaliacao());
 
     }
 }

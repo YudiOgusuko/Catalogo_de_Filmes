@@ -1,4 +1,4 @@
-package br.Catalogo.de.Filmes.model;
+package br.Catalogo.de.Filmes.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,7 +40,7 @@ public enum Genero {
         }
 
         for(Genero g : Genero.values()) {
-            if(genero.equalsIgnoreCase(g.generoEmPortugues)) {
+            if(genero.equalsIgnoreCase(g.name()) || genero.equalsIgnoreCase(g.generoEmPortugues)) {
                 return g;
             }
         }
