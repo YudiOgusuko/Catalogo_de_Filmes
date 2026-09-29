@@ -15,7 +15,7 @@ import lombok.Builder;
 public record SerieEpisodiosTemporadaDto(String titulo,
                                          String anoEpisodio,
                                          Integer episodio,
-                                         Double avaliacao) {
+                                         String avaliacao) {
 
     public SerieEpisodiosTemporadaDto(SerieEpisodiosTemporada serieEpisodiosTemporada) {
         this(serieEpisodiosTemporada.titulo(), serieEpisodiosTemporada.ano(),

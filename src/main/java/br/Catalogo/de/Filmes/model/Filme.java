@@ -22,21 +22,21 @@ public class Filme {
 
     private Integer ano;
     private String duracao;
-    private String genero;
+    private Genero genero;
     private String diretor;
     private String atores;
     private String trama;
     private String poster;
-    private Double avaliacao;
+    private String avaliacao;
 
-    public Filme(FilmeDto filmeDto) {
+    public Filme(FilmeDto filmeDto, Genero genero, String trama) {
         this.titulo = filmeDto.titulo();
         this.ano = filmeDto.ano();
         this.duracao = filmeDto.duracao();
-        this.genero = filmeDto.genero();
+        this.genero = genero;
         this.diretor = filmeDto.diretor();
         this.atores = filmeDto.atores();
-        this.trama = filmeDto.trama();
+        this.trama = trama;
         this.poster = filmeDto.poster();
         this.avaliacao = filmeDto.avaliacao();
     }

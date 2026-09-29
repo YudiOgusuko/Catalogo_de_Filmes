@@ -1,6 +1,5 @@
 package br.Catalogo.de.Filmes.model;
 
-import br.Catalogo.de.Filmes.dto.SerieEpisodiosTemporadaDto;
 import br.Catalogo.de.Filmes.dto.SerieTemporadaDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,13 +22,6 @@ public class Temporadas {
     private Integer temporada;
     private Integer anoTemporada;
 
-    @Column(unique = true)
-    private String tituloEpisodio;
-
-    private String anoEpisodio;
-    private Integer episodio;
-    private Double avaliacao;
-
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "serie_id")
     private Serie serie;
@@ -37,22 +29,9 @@ public class Temporadas {
     @OneToMany(mappedBy = "temporadas")
     private List<Episodio> episodioList;
 
-    public Temporadas(SerieTemporadaDto serieTemporadaDto, SerieEpisodiosTemporadaDto serieEpisodiosTemporadaDto) {
-        this.temporada = serieTemporadaDto.temporada();
-        this.anoTemporada = serieTemporadaDto.anoTemporada();
-        this.tituloEpisodio = serieEpisodiosTemporadaDto.titulo();
-        this.anoEpisodio = serieEpisodiosTemporadaDto.anoEpisodio();
-        this.episodio = serieEpisodiosTemporadaDto.episodio();
-        this.avaliacao = serieEpisodiosTemporadaDto.avaliacao();
-    }
-
     public Temporadas(SerieTemporadaDto serieTemporadaDto) {
         this.temporada = serieTemporadaDto.temporada();
         this.anoTemporada = serieTemporadaDto.anoTemporada();
-        this.tituloEpisodio = serieTemporadaDto.episodios().get(0).titulo();
-        this.anoEpisodio = serieTemporadaDto.episodios().get(0).anoEpisodio();
-        this.episodio = serieTemporadaDto.episodios().get(0).episodio();
-        this.avaliacao = serieTemporadaDto.episodios().get(0).avaliacao();
     }
 
 

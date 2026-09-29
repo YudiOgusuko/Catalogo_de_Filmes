@@ -1,7 +1,6 @@
 package br.Catalogo.de.Filmes.model;
 
 import br.Catalogo.de.Filmes.dto.SerieDto;
-import br.Catalogo.de.Filmes.handler.exception.NotFoundException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,12 +23,12 @@ public class Serie {
     private String titulo;
 
     private String ano;
-    private String genero;
+    private Genero genero;
     private String diretor;
     private String atores;
     private String trama;
     private String poster;
-    private Double avaliacao;
+    private String avaliacao;
     private Integer temporadas;
 
     @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL)
@@ -38,10 +37,10 @@ public class Serie {
     @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL)
     private List<Episodio> episodiosList = new ArrayList<>();
 
-    public Serie(SerieDto serieDto) {
+    public Serie(SerieDto serieDto, Genero genero) {
         this.titulo = serieDto.titulo();
         this.ano = serieDto.ano();
-        this.genero = serieDto.genero();
+        this.genero = genero;
         this.diretor = serieDto.diretor();
         this.atores = serieDto.atores();
         this.trama = serieDto.trama();
@@ -51,21 +50,28 @@ public class Serie {
 
     }
 
-    public void buscarTemporada(Temporadas temporadas) {
+    public Serie(SerieDto serieDto) {
+        this.titulo = serieDto.titulo();
+        this.ano = serieDto.ano();
+        this.genero = Genero.pegarGenero(serieDto.genero());
+        this.diretor = serieDto.diretor();
+        this.atores = serieDto.atores();
+        this.trama = serieDto.trama();
+        this.poster = serieDto.poster();
+        this.avaliacao = serieDto.avaliacao();
+        this.temporadas = serieDto.temporadas();
+
+    }
+
+    public void salvarTemporadas(Temporadas temporadas) {
         temporadas.setSerie(this);
         this.getTemporadasList().add(temporadas);
     }
 
-    public void buscarEpisodio(Integer numeroTemporada, Episodio episodio) {
-        Temporadas temporadaExistente = this.getTemporadasList().stream()
-                        .filter(t -> t.getTemporada().equals(numeroTemporada))
-                                .findFirst()
-                                        .orElseThrow(() -> new NotFoundException("Temporada não encontrada."));
-
+    public void salvarEpisodios(Temporadas temporadas, Episodio episodio) {
         episodio.setSerie(this);
         this.getEpisodiosList().add(episodio);
 
-        episodio.setTemporadas(temporadaExistente);
-        temporadaExistente.getEpisodioList().add(episodio);
+        episodio.setTemporadas(temporadas);
     }
 }

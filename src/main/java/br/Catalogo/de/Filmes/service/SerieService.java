@@ -2,6 +2,7 @@ package br.Catalogo.de.Filmes.service;
 
 import br.Catalogo.de.Filmes.dto.SerieDto;
 import br.Catalogo.de.Filmes.dto.SerieEpisodioDto;
+import br.Catalogo.de.Filmes.dto.SerieEpisodiosTemporadaDto;
 import br.Catalogo.de.Filmes.dto.SerieTemporadaDto;
 import br.Catalogo.de.Filmes.dto.conteudosDados.ConteudoSearchDados;
 import br.Catalogo.de.Filmes.dto.seriesData.SerieDados;
@@ -10,9 +11,9 @@ import br.Catalogo.de.Filmes.dto.seriesData.SerieTemporadas;
 import br.Catalogo.de.Filmes.handler.exception.BadRequestException;
 import br.Catalogo.de.Filmes.handler.exception.NotFoundException;
 import br.Catalogo.de.Filmes.model.Episodio;
+import br.Catalogo.de.Filmes.model.Genero;
 import br.Catalogo.de.Filmes.model.Serie;
 import br.Catalogo.de.Filmes.model.Temporadas;
-import br.Catalogo.de.Filmes.repository.ITemporadaRepository;
 import br.Catalogo.de.Filmes.repository.ISerieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,9 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -35,7 +38,6 @@ public class SerieService {
     private String apiUrl;
 
     private final ISerieRepository serieRepository;
-    private final ITemporadaRepository episodioRepository;
     private final RestTemplate restTemplate;
     private final String tipo = "&type=series";
 
@@ -73,14 +75,16 @@ public class SerieService {
                 throw new NotFoundException(String.format("Nenhum dado da série '%s' foi encontrado", tituloSerie));
             }
 
-            return new SerieDto(serieDados);
+            String genero = serieDados.genero().split(",")[0].trim();
+
+            return new SerieDto(serieDados, Genero.pegarStringGenero(genero));
 
         } catch (HandlerMethodValidationException e) {
             throw new BadRequestException(e.getMessage());
         }
     }
 
-    public SerieTemporadaDto pegarTemporada(String tituloSerie, Integer temporada) {
+    public SerieTemporadaDto buscarTemporada(String tituloSerie, Integer temporada) {
 
         tituloSerie = formatarString(tituloSerie);
 
@@ -94,45 +98,28 @@ public class SerieService {
                 throw new NotFoundException(String.format("Nenhuma temporada da série %s foi encontrada", tituloSerie));
             }
 
-            SerieTemporadaDto serieTemporadaDto = new SerieTemporadaDto(serieTemporadas);
-
-            Serie serieBanco = serieRepository.findByTituloIgnoreCase(tituloSerie)
-                    .orElseThrow(() -> new NotFoundException("Nenhuma série foi encontrada."));
-
-            serieTemporadaDto.episodios().forEach(x ->
-                    serieBanco.buscarTemporada(new Temporadas(serieTemporadaDto, x)));
-
-            serieRepository.save(serieBanco);
-
-            return serieTemporadaDto;
+            return new SerieTemporadaDto(serieTemporadas);
 
         }catch (RestClientException e) {
             throw new BadRequestException(e.getMessage());
         }
     }
 
-    public SerieEpisodioDto pegarEpisodio(String tituloSerie, Integer temporada, Integer episodio) {
+    public SerieEpisodioDto buscarEpisodio(String tituloSerie, Integer temporada, Integer episodio) {
 
         tituloSerie = formatarString(tituloSerie);
 
-        Serie serieBanco = serieRepository.findByTituloIgnoreCase(tituloSerie)
-                .orElseThrow(() -> new NotFoundException("Nenhuma série foi encontrada."));
+        SerieDto serieDto = buscarSerie(tituloSerie);
 
         try {
-            String url = String.format("%s%s&t=%s&season=%d&episode=%d%s", apiUrl, apiKey, tituloSerie, temporada, episodio, tipo);
+            String url = String.format("%s%s&t=%s&season=%d&episode=%d%s", apiUrl, apiKey, serieDto.titulo(), temporada, episodio, tipo);
             SerieEpisodios serieEpisodios = restTemplate.getForObject(url, SerieEpisodios.class);
 
             if(serieEpisodios == null || VerificarCampos.todosCamposNull(serieEpisodios)) {
-                throw new NotFoundException(String.format("Nenhum episódio foi encontrado para a série '%s' na temporada '%d.", tituloSerie, episodio));
+                throw new NotFoundException(String.format("Nenhum episódio foi encontrado para a série '%s' na temporada '%d'.", tituloSerie, episodio));
             }
 
-            SerieEpisodioDto serieEpisodioDto = new SerieEpisodioDto(serieEpisodios);
-
-            serieBanco.buscarEpisodio(temporada, new Episodio(serieEpisodioDto));
-
-            serieRepository.save(serieBanco);
-
-            return serieEpisodioDto;
+            return new SerieEpisodioDto(serieEpisodios);
 
         } catch (RestClientException e) {
             throw new BadRequestException(e.getMessage());
@@ -148,15 +135,42 @@ public class SerieService {
         tituloSerie = formatarString(tituloSerie);
 
         Optional<Serie> serieOptional = serieRepository.findByTituloIgnoreCase(tituloSerie);
-
         if(serieOptional.isPresent()) {
             throw new BadRequestException(String.format("A série %s ja foi adicionada.", serieOptional));
         }
 
-        SerieDto serieDto = buscarSerie(tituloSerie);
+        try {
+            SerieDto serieDto = buscarSerie(tituloSerie);
+            Serie serie = new Serie(serieDto);
 
-        serieRepository.save(new Serie(serieDto));
-        return serieDto;
+            String trama = "N/A";
+            if(!serie.getTrama().equalsIgnoreCase("N/A")) {
+                trama = IATraducao.traduzir(
+                                Map.of("trama", serie.getTrama()))
+                        .get("trama");
+            }
+
+            for (int i = 1; i <= serie.getTemporadas(); i++) {
+                SerieTemporadaDto temporadaDto = buscarTemporada(serie.getTitulo(), i);
+
+                if (temporadaDto != null && temporadaDto.episodios() != null) {
+                    Temporadas temporadas = new Temporadas(temporadaDto);
+                    serie.salvarTemporadas(temporadas);
+
+                    for(SerieEpisodiosTemporadaDto ep : temporadaDto.episodios()) {
+                        serie.salvarEpisodios(temporadas, new Episodio(ep));
+                    }
+                }
+            }
+
+            serie.setTrama(trama);
+            serieRepository.save(serie);
+
+            return serieDto;
+
+        } catch (RestClientException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     public String deletarSerie(String tituloSerie) {

@@ -7,8 +7,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-@JsonIgnoreProperties
-public record SerieTemporadas(@JsonProperty("Title") String titulo,
-                              @JsonProperty("Season") Integer temporada,
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record SerieTemporadas(@JsonProperty("Season") Integer temporada,
                               @JsonProperty("Episodes") List<SerieEpisodiosTemporada> serieEpisodioPorTemporadas) {
 }
