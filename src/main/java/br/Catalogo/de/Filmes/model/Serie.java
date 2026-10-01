@@ -48,7 +48,6 @@ public class Serie {
         this.poster = serieDto.poster();
         this.avaliacao = serieDto.avaliacao();
         this.temporadas = serieDto.temporadas();
-
     }
 
     public void salvarTemporadas(Temporadas temporadas) {

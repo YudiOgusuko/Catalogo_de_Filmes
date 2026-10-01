@@ -14,9 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import java.time.Year;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,18 +51,18 @@ public class FilmeService {
         }
     }
 
-    public FilmeDto buscarFilmes(String tituloFilme) {
+    public List<FilmeDto> buscarFilme(String tituloFilme) {
 
         tituloFilme = formatarString(tituloFilme);
 
-        Optional<Filme> filmeNoBanco = filmeRepository.findByTituloIgnoreCase(tituloFilme);
-        if (filmeNoBanco.isPresent()) {
-            return new FilmeDto(filmeNoBanco.get());
+        List<FilmeDto> filmeNoBanco = filmeRepository.findByTituloContainingIgnoreCase(tituloFilme).stream().map(FilmeDto::new).toList();
+        if (!filmeNoBanco.isEmpty()) {
+            return filmeNoBanco;
         }
-        return buscarFilmesNaApi(tituloFilme);
+        return List.of(buscarFilmesNaApi(tituloFilme));
     }
 
-    public FilmeDto buscarFilmesNaApi(String tituloFilme) {
+    private FilmeDto buscarFilmesNaApi(String tituloFilme) {
 
             String url = String.format("%s%s&t=%s%s", apiUrl, apiKey, tituloFilme, "&type=movie");
             FilmeDados filmeDados = restTemplate.getForObject(url, FilmeDados.class);
@@ -73,6 +74,64 @@ public class FilmeService {
             String genero = filmeDados.genero().split(",")[0].trim();
 
             return new FilmeDto(filmeDados, Genero.pegarStringGenero(genero));
+    }
+
+    public List<FilmeDto> buscarFilmePorGenero(String genero) {
+        return filmeRepository.findAllByGenero(Genero.pegarGenero(genero)).stream().map(FilmeDto::new).toList();
+    }
+
+    public List<FilmeDto> buscarFilmePorAtor(String ator) {
+        return filmeRepository.findAllByAtoresContainingIgnoreCase(ator).stream().map(FilmeDto::new).toList();
+    }
+
+    public List<FilmeDto> top5Filmes() {
+        return filmeRepository.findTop5().stream().map(FilmeDto::new).toList();
+    }
+
+    public List<FilmeDto> filtrarPorAvaliacaoMaxima(Double avaliacao) {
+        return filmeRepository.findByAvaliacaoMaxima(avaliacao).stream().map(FilmeDto::new).toList();
+    }
+
+    public List<FilmeDto> filtrarPorAvaliacaoMinima(Double avaliacao) {
+        return filmeRepository.findByAvaliacaoMinima(avaliacao).stream().map(FilmeDto::new).toList();
+    }
+
+    public List<FilmeDto> filtrarPorAnoMaximo(Year ano) {
+        List<FilmeDto> filmeDtoList = new ArrayList<>();
+
+        filmeRepository.findAll()
+                .stream()
+                .map(filme -> {
+                    String anoFilme = String.valueOf(filme.getAno());
+                    Year anoFinalFilme = Year.parse(anoFilme);
+                    if(anoFinalFilme.equals(ano) || anoFinalFilme.isBefore(ano)) {
+                        filmeDtoList.add(new FilmeDto(filme));
+                    }
+                    return null;
+                }).toList();
+
+        return filmeDtoList;
+    }
+
+    public List<FilmeDto> filtrarPorAnoMinimo(Year ano) {
+        List<FilmeDto> filmeDtoList = new ArrayList<>();
+
+        filmeRepository.findAll()
+                .stream()
+                .map(filme -> {
+                    String anoFilme = String.valueOf(filme.getAno());
+                    Year anoFinalFilme = Year.parse(anoFilme);
+                    if(anoFinalFilme.equals(ano) || anoFinalFilme.isAfter(ano)) {
+                        filmeDtoList.add(new FilmeDto(filme));
+                    }
+                    return null;
+                }).toList();
+
+        return filmeDtoList;
+    }
+
+    public List<FilmeDto> verTodosFilmes() {
+        return filmeRepository.findAll().stream().map(FilmeDto::new).toList();
     }
 
     public FilmeDto adicionarFilme(String tituloFilme) {
@@ -118,10 +177,6 @@ public class FilmeService {
     public String deletarTodosFilmes() {
         filmeRepository.deleteAll();
         return "Todos os filmes foram deletados do catálogo.";
-    }
-
-    public List<FilmeDto> verTodosFilmes() {
-        return filmeRepository.findAll().stream().map(FilmeDto::new).toList();
     }
 
     private String formatarString(String txt) {

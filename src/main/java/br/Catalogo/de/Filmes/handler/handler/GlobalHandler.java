@@ -3,6 +3,7 @@ package br.Catalogo.de.Filmes.handler.handler;
 import br.Catalogo.de.Filmes.handler.erroResponse.ErrorResponse;
 import br.Catalogo.de.Filmes.handler.exception.BadRequestException;
 import br.Catalogo.de.Filmes.handler.exception.NotFoundException;
+import jakarta.validation.UnexpectedTypeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalHandler {
@@ -46,6 +48,26 @@ public class GlobalHandler {
                 .build();
 
         return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(UnexpectedTypeException.class)
+    public ResponseEntity<ErrorResponse> badRequestHandlerMethod(UnexpectedTypeException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .message("A data passada é inválida. Por favor tente Novamente.")
+                .status(HttpStatus.BAD_REQUEST.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> badRequestHandlerMethod(NoResourceFoundException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .message("A requisição realizada esta incorreta. Dê uma olhada no Construtor.")
+                .status(HttpStatus.BAD_REQUEST.value())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(BadRequestException.class)

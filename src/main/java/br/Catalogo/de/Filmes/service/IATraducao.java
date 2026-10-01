@@ -63,7 +63,8 @@ public class IATraducao {
         GenerateContentResponse response = gerarSemErro(prompt, config);
 
         Map<String, String> dadosTraduzidos = MAPPER.readValue(
-                response != null ? response.text() : null, new TypeReference<Map<String, String>>() {});
+                response != null ? response.text() : null, new TypeReference<>() {
+                });
 
         Map<String, String> resultado = new LinkedHashMap<>(dados);
         resultado.putAll(dadosTraduzidos);
@@ -88,6 +89,7 @@ public class IATraducao {
                 }
             }
         }
+        assert ultimoErro != null;
         throw ultimoErro;
     }
 

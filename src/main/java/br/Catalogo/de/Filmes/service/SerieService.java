@@ -17,15 +17,17 @@ import br.Catalogo.de.Filmes.model.Temporadas;
 import br.Catalogo.de.Filmes.repository.ISerieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import java.time.Year;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -60,15 +62,15 @@ public class SerieService {
         }
     }
 
-    public SerieDto buscarSerie(String tituloSerie) {
+    public List<SerieDto> buscarSerie(String tituloSerie) {
 
         tituloSerie = formatarString(tituloSerie);
 
-        Optional<Serie> serieNoBanco = serieRepository.findByTituloIgnoreCase(tituloSerie);
-        if(serieNoBanco.isPresent()) {
-            return new SerieDto(serieNoBanco.get());
+        List<SerieDto> serieNoBanco = serieRepository.findByTituloContainingIgnoreCase(tituloSerie).stream().map(SerieDto::new).toList();
+        if(!serieNoBanco.isEmpty()) {
+            return serieNoBanco;
         }
-        return buscarSerieNaApi(tituloSerie);
+        return List.of(buscarSerieNaApi(tituloSerie));
     }
 
     private SerieDto buscarSerieNaApi(String tituloSerie) {
@@ -85,12 +87,35 @@ public class SerieService {
         return new SerieDto(serieDados, Genero.pegarStringGenero(genero));
     }
 
+    public List<SerieDto> buscarSeriePorGenero(String genero) {
+        return serieRepository.findAllByGenero(Genero.pegarGenero(genero)).stream().map(SerieDto::new).toList();
+    }
+
+    public List<SerieDto> buscarSeriePorAtor(String ator) {
+        return serieRepository.findAllByAtoresContainingIgnoreCase(ator).stream().map(SerieDto::new).toList();
+    }
+
+    public List<SerieDto> top5Series() {
+        return serieRepository.findTop5().stream().map(SerieDto::new).toList();
+    }
+
+    public List<SerieEpisodiosTemporadaDto> top5EpisodiosDaSerie(String tituloSerie) {
+        Serie serie = serieRepository.findByTituloIgnoreCase(tituloSerie)
+                .orElseThrow(() -> new NotFoundException(String.format("A série '%s' não está no catálogo.", tituloSerie)));
+
+        return serieRepository.findTop5Episodios(serie.getId(), PageRequest.of(0, 5))
+                .stream()
+                .map(SerieEpisodiosTemporadaDto::new)
+                .toList();
+    }
+
     public SerieTemporadaDto buscarTemporada(String tituloSerie, Integer temporada) {
-        SerieDto serie = buscarSerie(tituloSerie);
+        List<SerieDto> serieList = buscarSerie(tituloSerie);
+        SerieDto serie = serieList.get(0);
         return buscarTemporadaNaApi(serie.titulo(), temporada);
     }
 
-    public SerieTemporadaDto buscarTemporadaNaApi(String tituloSerie, Integer temporada) {
+    private SerieTemporadaDto buscarTemporadaNaApi(String tituloSerie, Integer temporada) {
         try {
 
             String url = String.format("%s%s&t=%s&season=%d%s", apiUrl, apiKey, tituloSerie, temporada, tipo);
@@ -108,11 +133,12 @@ public class SerieService {
     }
 
     public SerieEpisodioDto buscarEpisodio(String tituloSerie, Integer temporada, Integer episodio) {
-        SerieDto serie = buscarSerie(tituloSerie);
+        List<SerieDto> serieList = buscarSerie(tituloSerie);
+        SerieDto serie = serieList.get(0);
         return buscarEpisodioNaApi(serie.titulo(), temporada, episodio);
     }
 
-    public SerieEpisodioDto buscarEpisodioNaApi(String tituloSerie, Integer temporada, Integer episodio) {
+    private SerieEpisodioDto buscarEpisodioNaApi(String tituloSerie, Integer temporada, Integer episodio) {
         try {
 
             String url = String.format("%s%s&t=%s&season=%d&episode=%d%s", apiUrl, apiKey, tituloSerie, temporada, episodio, tipo);
@@ -136,6 +162,55 @@ public class SerieService {
         }
     }
 
+    public List<SerieDto> filtrarPorTemporadaMaxima(Integer temporada) {
+        return serieRepository.findByTemporadasLessThanEqual(temporada).stream().map(SerieDto::new).toList();
+    }
+
+    public List<SerieDto> filtrarPorTemporadaMinima(Integer temporada) {
+        return serieRepository.findByTemporadasGreaterThanEqual(temporada).stream().map(SerieDto::new).toList();
+    }
+
+    public List<SerieDto> filtrarPorAvaliacaoMaxima(Double avaliacao) {
+        return serieRepository.findByAvaliacaoMaxima(avaliacao).stream().map(SerieDto::new).toList();
+    }
+
+    public List<SerieDto> filtrarPorAvaliacaoMinima(Double avaliacao) {
+        return serieRepository.findByAvaliacaoMinima(avaliacao).stream().map(SerieDto::new).toList();
+    }
+
+    public List<SerieDto> filtrarPorAnoMaximo(Year ano) {
+        List<SerieDto> serieDtoList = new ArrayList<>();
+
+        serieRepository.findAll()
+                .stream()
+                .map(serie -> {
+                    Year anoFinalSerie = Year.parse(serie.getAno().substring(5, 9));
+                    if(anoFinalSerie.equals(ano) || anoFinalSerie.isBefore(ano)) {
+                        serieDtoList.add(new SerieDto(serie));
+                    }
+                    return null;
+                }).toList();
+
+        return serieDtoList;
+    }
+
+    public List<SerieDto> filtrarPorAnoMinimo(Year ano) {
+        List<SerieDto> serieDtoList = new ArrayList<>();
+
+       serieRepository.findAll()
+                .stream()
+                .map(serie -> {
+                    Year anoInicialSerie = Year.parse(serie.getAno().substring(0, 4));
+                    Year anoFinalSerie = Year.parse(serie.getAno().substring(5, 9));
+                    if(anoInicialSerie.equals(ano) || anoInicialSerie.isBefore(ano) || anoFinalSerie.isAfter(ano) || anoFinalSerie.equals(ano) ) {
+                        serieDtoList.add(new SerieDto(serie));
+                    }
+                    return null;
+                }).toList();
+
+        return serieDtoList;
+    }
+
     public List<SerieDto> verTodasSeries() {
         return serieRepository.findAll().stream().map(SerieDto::new).toList();
     }
@@ -156,7 +231,7 @@ public class SerieService {
             for (int i = 1; i <= serie.getTemporadas(); i++) {
                 SerieTemporadaDto temporadaDto = buscarTemporadaNaApi(serie.getTitulo(), i);
 
-                if (temporadaDto != null && temporadaDto.episodios() != null) {
+                if (temporadaDto.episodios() != null) {
                     Temporadas temporadas = new Temporadas(temporadaDto);
                     serie.salvarTemporadas(temporadas);
 
@@ -182,8 +257,9 @@ public class SerieService {
 
     public String deletarSerie(String tituloSerie) {
 
-        tituloSerie = formatarString(tituloSerie);
-        Serie serie = buscarNoBanco(tituloSerie);
+        String serieNome = formatarString(tituloSerie);
+        Serie serie = serieRepository.findByTituloIgnoreCase(tituloSerie)
+                        .orElseThrow(() -> new NotFoundException(String.format("A série '%s' não esta no catálogo.", serieNome)));
 
         serieRepository.delete(serie);
         return String.format("A série %s foi deletada do catálogo.", tituloSerie);
@@ -192,11 +268,6 @@ public class SerieService {
     public String deletarTodasSeries() {
         serieRepository.deleteAll();
         return "Todos as séries foram deletadas do catálogo.";
-    }
-
-    private Serie buscarNoBanco(String tituloSerie) {
-        return serieRepository.findByTituloIgnoreCase(tituloSerie)
-                .orElseThrow(() -> new NotFoundException("A série informada não está no catálogo."));
     }
 
     private String formatarString(String txt) {

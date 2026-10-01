@@ -2,6 +2,7 @@ package br.Catalogo.de.Filmes.controller;
 
 import br.Catalogo.de.Filmes.dto.SerieDto;
 import br.Catalogo.de.Filmes.dto.SerieEpisodioDto;
+import br.Catalogo.de.Filmes.dto.SerieEpisodiosTemporadaDto;
 import br.Catalogo.de.Filmes.dto.SerieTemporadaDto;
 import br.Catalogo.de.Filmes.dto.conteudosDados.ConteudoSearchDados;
 import br.Catalogo.de.Filmes.service.SerieService;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Year;
 import java.util.List;
 
 @RestController
@@ -30,12 +32,44 @@ public class SerieController {
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<SerieDto> buscarSerie(
+    public ResponseEntity<List<SerieDto>> buscarSerie(
             @RequestParam
             @NotEmpty(message = "O nome da série não pode estar vazia.")
-            @Size(max = 74, message = "O nome da série pode ter no máximo, 74 caracteres.")
+            @Size(max = 74, message = "O nome da série pode ter no máximo 74 caracteres.")
             String serie) {
         return ResponseEntity.ok().body(service.buscarSerie(serie));
+    }
+
+    @GetMapping("/buscarPorGenero")
+    public ResponseEntity<List<SerieDto>> buscarSeriePorGenero(
+            @RequestParam
+            @NotEmpty(message = "O gênero não pode estar vazio.")
+            @Size(max = 12, message = "O gênero do filme não pode ultrapassar 12 caracteres.")
+            String genero) {
+        return ResponseEntity.ok().body(service.buscarSeriePorGenero(genero));
+    }
+
+    @GetMapping("/buscarPorAtor")
+    public ResponseEntity<List<SerieDto>> buscarSeriePorAtor(
+            @RequestParam
+            @NotEmpty(message = "O nome do(a) ator(a) não pode estar vazio.")
+            @Size(max = 30, message = "O nome do(a) ator(a) não pode ultrapassar 12 caracteres.")
+            String ator) {
+        return ResponseEntity.ok().body(service.buscarSeriePorAtor(ator));
+    }
+
+    @GetMapping("/top5Series")
+    public ResponseEntity<List<SerieDto>> top5Series() {
+        return ResponseEntity.ok().body(service.top5Series());
+    }
+
+    @GetMapping("/top5Episodios")
+    public ResponseEntity<List<SerieEpisodiosTemporadaDto>> top5EpisodiosDaSerie(
+            @RequestParam
+            @NotEmpty(message = "O nome da série não pode estar vazia.")
+            @Size(max = 30, message = "O nome da série pode ter no máximo 74 caracteres.")
+            String serie){
+        return ResponseEntity.ok().body(service.top5EpisodiosDaSerie(serie));
     }
 
     @GetMapping("/pegarTemporada")
@@ -74,8 +108,66 @@ public class SerieController {
         return ResponseEntity.ok().body(service.buscarEpisodio(serie, temporada, episodio));
     }
 
+    @GetMapping("filtrarPorTemporadaMaxima")
+    public ResponseEntity<List<SerieDto>> filtrarPorTemporadaMaxima(
+            @RequestParam
+            @NotNull(message = "A temporada não pode ser nula.")
+            @Positive(message = "O número deve ser positivo.")
+            @Max(value = 60, message = "O número máximo de temporada é 60")
+            Integer temporada) {
+        return ResponseEntity.ok().body(service. filtrarPorTemporadaMaxima(temporada));
+    }
+
+    @GetMapping("filtrarPorTemporadaMinima")
+    public ResponseEntity<List<SerieDto>> filtrarPorTemporadaMinima(
+            @RequestParam
+            @NotNull(message = "A temporada não pode ser nula.")
+            @Positive(message = "O número deve ser positivo.")
+            @Max(value = 60, message = "O número máximo de temporada é 60")
+            Integer temporada) {
+        return ResponseEntity.ok().body(service. filtrarPorTemporadaMinima(temporada));
+    }
+
+    @GetMapping("filtrarPorAvaliacaoMaxima")
+    public ResponseEntity<List<SerieDto>> filtrarPorAvaliacaoMaxima(
+            @RequestParam
+            @NotNull(message = "A avaliação não pode ser nula.")
+            @Positive(message = "O valor da avaliação deve ser positivo.")
+            @Max(value = 10, message = "O número máximo da avaliação é 10")
+            Double avaliacao) {
+        return ResponseEntity.ok().body(service. filtrarPorAvaliacaoMaxima(avaliacao));
+    }
+
+    @GetMapping("filtrarPorAvaliacaoMinima")
+    public ResponseEntity<List<SerieDto>> filtrarPorAvaliacaoMinima(
+            @RequestParam
+            @NotNull(message = "A avaliação não pode ser nula.")
+            @Positive(message = "O valor da avaliação deve ser positivo.")
+            @Max(value = 10, message = "O número máximo da avaliação é 10")
+            Double avaliacao) {
+        return ResponseEntity.ok().body(service. filtrarPorAvaliacaoMinima(avaliacao));
+    }
+
+    @GetMapping("filtrarPorAnoMaximo")
+    public ResponseEntity<List<SerieDto>> filtrarPorAnoMaximo(
+            @RequestParam
+            @NotNull(message = "O ano não pode ser nula.")
+            @PastOrPresent(message = "O ano não pode ser maio que o ano atual.")
+            Year ano) {
+        return ResponseEntity.ok().body(service. filtrarPorAnoMaximo(ano));
+    }
+
+    @GetMapping("filtrarPorAnoMinimo")
+    public ResponseEntity<List<SerieDto>> filtrarPorAnoMinimo(
+            @RequestParam
+            @NotNull(message = "A avaliação não pode ser nula.")
+            @PastOrPresent(message = "O ano não pode ser maio que o ano atual.")
+            Year ano) {
+        return ResponseEntity.ok().body(service. filtrarPorAnoMinimo(ano));
+    }
+
     @GetMapping("/all")
-    public ResponseEntity<List<SerieDto>> verTodosSeries() {
+    public ResponseEntity<List<SerieDto>> verTodasSeries() {
         return ResponseEntity.ok().body(service.verTodasSeries());
     }
 
@@ -98,7 +190,7 @@ public class SerieController {
     }
 
     @DeleteMapping("/deleteAll")
-    public ResponseEntity<String> deletarTodosSeries() {
+    public ResponseEntity<String> deletarTodasSeries() {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(service.deletarTodasSeries());
     }
 }

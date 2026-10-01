@@ -33,6 +33,4 @@ public class Temporadas {
         this.temporada = serieTemporadaDto.temporada();
         this.anoTemporada = serieTemporadaDto.anoTemporada();
     }
-
-
 }
