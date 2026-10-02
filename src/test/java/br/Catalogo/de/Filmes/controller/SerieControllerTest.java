@@ -5,6 +5,7 @@ import br.Catalogo.de.Filmes.dto.SerieEpisodioDto;
 import br.Catalogo.de.Filmes.dto.SerieEpisodiosTemporadaDto;
 import br.Catalogo.de.Filmes.dto.SerieTemporadaDto;
 import br.Catalogo.de.Filmes.dto.conteudosDados.ConteudoSearchDados;
+import br.Catalogo.de.Filmes.handler.exception.NotFoundException;
 import br.Catalogo.de.Filmes.service.SerieService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,7 @@ class SerieControllerTest {
 
     @Test
     @DisplayName("Buscar a série no Banco.")
-    void buscarSerieNoBanco() throws Exception {
+    void buscarSerie_NoBanco() throws Exception {
 
         given(service.buscarSerie(serie))
                 .willReturn(List.of(SerieDto.builder().build()));
@@ -60,6 +61,39 @@ class SerieControllerTest {
                         .param("serie", serie)
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Buscar a série no API.")
+    void buscarSerie_NaApi() throws Exception {
+
+        String  tituloSerie = "The Wire";
+        SerieDto serieDto = SerieDto.builder().titulo(tituloSerie).build();
+
+        given(service.buscarSerie(tituloSerie))
+                .willReturn(List.of(serieDto));
+
+        mockMvc.perform(
+                get(request + "/buscar")
+                        .param("serie", tituloSerie)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Lançar exceção ao tentar buscar a série.")
+    void buscarSerie_Excecao() throws Exception {
+
+        String serieInexistente = "Série Inexistente";
+
+        given(service.buscarSerie(serieInexistente))
+                .willThrow(new NotFoundException(String.format("Não foi possível encontrar a série '%s'.", serieInexistente)));
+
+        mockMvc.perform(
+                get(request + "/buscar")
+                        .param("serie", serieInexistente)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isNotFound());
     }
 
     @Test
@@ -139,7 +173,47 @@ class SerieControllerTest {
     }
 
     @Test
-    @DisplayName("Buscar episódio de série no Banco.")
+    @DisplayName("Buscar temporada da série na API.")
+    void buscarTemporada_NaApi() throws Exception {
+
+        String tituloSerie = "The Sopranos";
+        Integer temporada = 1;
+        SerieTemporadaDto serieTemporadaDto = SerieTemporadaDto.builder()
+                .temporada(temporada)
+                .anoTemporada(1999)
+                .build();
+
+        given(service.buscarTemporada(tituloSerie, temporada))
+                .willReturn(serieTemporadaDto);
+
+        mockMvc.perform(
+                get(request + "/pegarTemporada")
+                        .param("serie", tituloSerie)
+                        .param("temporada", String.valueOf(temporada))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Lançar exceção ao tentar buscar temporada da série.")
+    void buscarTemporada_Excecao() throws Exception {
+
+        String serieInexistente = "Série Inexistente";
+        Integer temporada = 10;
+
+        given(service.buscarTemporada(serieInexistente, temporada))
+                .willThrow(new NotFoundException(String.format("Não foi possível encontrar a temporada '%d' da série '%s'.", temporada, serieInexistente)));
+
+        mockMvc.perform(
+                get(request + "/pegarTemporada")
+                        .param("serie", serieInexistente)
+                        .param("temporada", String.valueOf(temporada))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Buscar episódio da série no Banco.")
     void buscarEpisodio_NoBanco() throws Exception {
 
         Integer temporada = 1;
@@ -155,6 +229,52 @@ class SerieControllerTest {
                         .param("episodio", String.valueOf(episodio))
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Buscar episódio da série na API.")
+    void buscarEpisodio_NaApi() throws Exception {
+
+        String tituloSerie = "Game of Thrones";
+        Integer temporada = 6;
+        Integer episodio = 9;
+
+        SerieEpisodioDto serieEpisodioDto = SerieEpisodioDto.builder()
+                .titulo("Battle of the Bastards")
+                .temporada(temporada)
+                .episodio(episodio)
+                .build();
+
+        given(service.buscarEpisodio(tituloSerie, temporada, episodio))
+                .willReturn(serieEpisodioDto);
+
+        mockMvc.perform(
+                get(request + "/pegarEpisodio")
+                        .param("serie", tituloSerie)
+                        .param("temporada", String.valueOf(temporada))
+                        .param("episodio", String.valueOf(episodio))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Lançar exceção ao tentar buscar episódio da série.")
+    void buscarEpisodio_Excecao() throws Exception {
+
+        String serieInexistente = "Série Inexistente";
+        Integer temporada = 10;
+        Integer episodio = 20;
+
+        given(service.buscarEpisodio(serieInexistente, temporada, episodio))
+                .willThrow(new NotFoundException(String.format("Não foi possível encontrar episódio '%d' da temporada '%d' da série '%s'.", episodio, temporada, serieInexistente)));
+
+        mockMvc.perform(
+                get(request + "/pegarEpisodio")
+                        .param("serie", serieInexistente)
+                        .param("temporada", String.valueOf(temporada))
+                        .param("episodio", String.valueOf(episodio))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isNotFound());
     }
 
     @Test

@@ -2,6 +2,7 @@ package br.Catalogo.de.Filmes.controller;
 
 import br.Catalogo.de.Filmes.dto.FilmeDto;
 import br.Catalogo.de.Filmes.dto.conteudosDados.ConteudoSearchDados;
+import br.Catalogo.de.Filmes.handler.exception.NotFoundException;
 import br.Catalogo.de.Filmes.service.FilmeService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,13 +51,47 @@ class FilmeControllerTest {
     void buscarFilme_NoBanco() throws Exception {
 
         given(service.buscarFilme(filme))
-                .willReturn(List.of(FilmeDto.builder().build()));
+                .willReturn(List.of(FilmeDto.builder().titulo(filme).build()));
 
         mockMvc.perform(
                 get(request + "/buscar")
                         .param("filme", filme)
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Buscar o filme no API.")
+    void buscarFilme_NaApi() throws Exception {
+
+        String tituloFilme = "Avatar";
+
+        FilmeDto filmeDtoApi = FilmeDto.builder().titulo(tituloFilme).build();
+
+        given(service.buscarFilme(tituloFilme))
+                .willReturn(List.of(filmeDtoApi));
+
+        mockMvc.perform(
+                get(request + "/buscar")
+                        .param("filme", tituloFilme)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Lançar exceção ao tentar buscar o filme.")
+    void buscarFilme_Excecao() throws Exception {
+
+        String filmeInexistente = "Filme Inexistente";
+
+        given(service.buscarFilme(filmeInexistente))
+                .willThrow(new NotFoundException(String.format("Não foi possível encontrar nenhum filme com o título '%s'", filmeInexistente)));
+
+        mockMvc.perform(
+                get(request + "/buscar")
+                        .param("filme", filmeInexistente)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isNotFound());
     }
 
     @Test
@@ -140,10 +175,16 @@ class FilmeControllerTest {
     @DisplayName("Filtrar filmes pelo ano máximo.")
     void filtrarPorAnoMaximo() throws Exception {
 
-        Year ano = Year.now();
+        FilmeDto filmeDto = FilmeDto.builder()
+                .titulo("Toy Story 2")
+                .ano(1999).duracao("92 min").genero("Animação")
+                .diretor("John Lasseter, Ash Brannon, Lee Unkrich").avaliacao("7.9")
+                .build();
+
+        Year ano = Year.of(2000);
 
         given(service.filtrarPorAnoMaximo(ano))
-                .willReturn(List.of(FilmeDto.builder().build()));
+                .willReturn(List.of(filmeDto));
 
         mockMvc.perform(
                 get(request + "/filtrarPorAnoMaximo")
@@ -156,14 +197,20 @@ class FilmeControllerTest {
     @DisplayName("Filtrar filmes pelo ano mínimo.")
     void filtrarPorAnoMinimo() throws Exception {
 
-        Year ano = Year.now();
+        FilmeDto filmeDto = FilmeDto.builder()
+                .titulo("Harry Potter and the Half-Blood Prince")
+                .ano(1999).duracao("153 min").genero("Ação")
+                .diretor("David Yates").avaliacao("7.6")
+                .build();
+
+        Year ano = Year.of(2008);
 
         given(service.filtrarPorAnoMinimo(ano))
-                .willReturn(List.of(FilmeDto.builder().build()));
+                .willReturn(List.of(filmeDto));
 
         mockMvc.perform(
                 get(request + "/filtrarPorAnoMinimo")
-                        .param("ano", String.valueOf(ano))
+                        .param("ano",String.valueOf(ano))
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
     }
