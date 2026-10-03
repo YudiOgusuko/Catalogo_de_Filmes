@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: Catalogo-de-Filmes
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/catalogo_de_filmes?createDatabaseIfNotExist=true
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        id:
+          new_generator_mappings: true
+
+omdb:
+  api:
+    key: ${OMDB_API_KEY}
+    url: "https://www.omdbapi.com/?apikey="
+
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY}

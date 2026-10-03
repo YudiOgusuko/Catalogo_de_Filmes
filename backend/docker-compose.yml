@@ -1,0 +1,47 @@
+services:
+    mysql:
+      image: mysql:8.0
+      container_name: meu_mySQL
+      restart: unless-stopped
+      environment:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+        MYSQL_DATABASE: meu_banco
+      ports:
+        - "3307:3306"
+      volumes:
+        - mysql_data:/var/lib/mysql
+      healthcheck:
+        test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD} --silent"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+        start_period: 30s
+      networks:
+        - catalogo_network
+
+    catalogo_de_filmes:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      container_name: catalogo_de_filmes
+      restart: unless-stopped
+      ports:
+        - "8080:8080"
+      env_file:
+        - .env
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/meu_banco
+        SPRING_DATASOURCE_USERNAME: ${MYSQL_USERNAME}
+        SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      depends_on:
+        mysql:
+          condition: service_healthy
+      networks:
+        - catalogo_network
+
+volumes:
+  mysql_data:
+
+networks:
+  catalogo_network:
+    driver: bridge
