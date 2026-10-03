@@ -10,7 +10,7 @@ import java.util.List;
 @JsonPropertyOrder({
         "temporada",
         "anoTemporada",
-        "episódios"
+        "episodios"
 })
 public record SerieTemporadaDto(Integer temporada,
                                 Integer anoTemporada,

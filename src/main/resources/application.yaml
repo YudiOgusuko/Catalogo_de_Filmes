@@ -3,7 +3,7 @@ spring:
     name: Catalogo-de-Filmes
 
   datasource:
-    url: jdbc:mysql://localhost:3306/Catalogo_de_Filmes?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/catalogo_de_filmes?createDatabaseIfNotExist=true
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
 

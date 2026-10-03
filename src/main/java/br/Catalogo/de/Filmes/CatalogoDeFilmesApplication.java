@@ -1,6 +1,5 @@
 package br.Catalogo.de.Filmes;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -8,9 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class CatalogoDeFilmesApplication {
 
 	public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.load();
-		dotenv.entries().forEach(d ->
-				System.setProperty(d.getKey(), d.getValue()));
+
+		String apiKey = System.getenv("omdb.api.key");
+		String apiUrl = System.getenv("omdb.api.url");
+		String iaApiKey = System.getenv("GEMINI_API_KEY");
+
 		SpringApplication.run(CatalogoDeFilmesApplication.class, args);
 	}
 }

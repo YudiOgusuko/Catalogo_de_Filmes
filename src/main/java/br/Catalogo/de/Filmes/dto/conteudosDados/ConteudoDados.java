@@ -7,5 +7,6 @@ import lombok.Builder;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ConteudoDados(@JsonProperty("Title") String titulo,
-                            @JsonProperty("Year") String ano) {
+                            @JsonProperty("Year") String ano,
+                            @JsonProperty("Poster") String poster) {
 }

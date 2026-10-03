@@ -26,7 +26,7 @@ public class IATraducao {
     private static final int tentativas_max = 3;
 
     public static Client criarCliente() {
-        String apiKey = Dotenv.load().get("GEMINI_API_KEY");
+        String apiKey = System.getenv("GEMINI_API_KEY");
 
         if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalStateException("A chave GEMINI_API_KEY não foi encontrada no .env ou nas variáveis do sistema.");

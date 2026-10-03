@@ -200,9 +200,8 @@ public class SerieService {
        serieRepository.findAll()
                 .stream()
                 .map(serie -> {
-                    Year anoInicialSerie = Year.parse(serie.getAno().substring(0, 4));
                     Year anoFinalSerie = Year.parse(serie.getAno().substring(5, 9));
-                    if(anoInicialSerie.equals(ano) || anoInicialSerie.isBefore(ano) || anoFinalSerie.isAfter(ano) || anoFinalSerie.equals(ano) ) {
+                    if( anoFinalSerie.equals(ano) || anoFinalSerie.isAfter(ano) ) {
                         serieDtoList.add(new SerieDto(serie));
                     }
                     return null;
