@@ -178,36 +178,76 @@ public class SerieService {
         return serieRepository.findByAvaliacaoMinima(avaliacao).stream().map(SerieDto::new).toList();
     }
 
-    public List<SerieDto> filtrarPorAnoMaximo(Year ano) {
-        List<SerieDto> serieDtoList = new ArrayList<>();
+//    public List<SerieDto> filtrarPorAnoMaximo(Year ano) {
+//        List<SerieDto> serieDtoList = new ArrayList<>();
+//
+//        serieRepository.findAll()
+//                .stream()
+//                .map(serie -> {
+//                    Year anoUnicoSerie = Year.parse(serie.getAno().substring(0, 4));
+//                    Year anoFinalSerie = Year.parse(serie.getAno().substring(5, 9));
+//                    if(anoFinalSerie.equals(ano) || anoFinalSerie.isBefore(ano) || (anoUnicoSerie.equals(ano) || anoUnicoSerie.isBefore(ano))){
+//                        serieDtoList.add(new SerieDto(serie));
+//                    }
+//                    return null;
+//                }).toList();
+//
+//        return serieDtoList;
+//    }
+//
+//    public List<SerieDto> filtrarPorAnoMinimo(Year ano) {
+//        List<SerieDto> serieDtoList = new ArrayList<>();
+//
+//       serieRepository.findAll()
+//                .stream()
+//                .map(serie -> {
+//                    Year anoUnicoSerie = Year.parse(serie.getAno().substring(0, 4));
+//                    Year anoFinalSerie = Year.parse(serie.getAno().substring(5, 9));
+//                    if(anoFinalSerie.equals(ano) || anoFinalSerie.isAfter(ano) || (anoUnicoSerie.equals(ano) || anoUnicoSerie.isBefore(ano))) {
+//                        serieDtoList.add(new SerieDto(serie));
+//                    }
+//                    return null;
+//                }).toList();
+//
+//        return serieDtoList;
+//    }
 
-        serieRepository.findAll()
-                .stream()
-                .map(serie -> {
-                    Year anoFinalSerie = Year.parse(serie.getAno().substring(5, 9));
-                    if(anoFinalSerie.equals(ano) || anoFinalSerie.isBefore(ano)) {
-                        serieDtoList.add(new SerieDto(serie));
+    public List<SerieDto> filtrarPorAnoMaximo(Year anoMaximo) {
+        return serieRepository.findAll().stream()
+                .filter(serie -> {
+                    String ano = serie.getAno();
+                    if (ano == null || ano.isBlank()) return false;
+
+                    if (ano.length() >= 9 && ano.contains("-")) {
+                        Year anoInicio = Year.parse(ano.substring(0, 4));
+                        return anoInicio.equals(anoMaximo) || anoInicio.isBefore(anoMaximo);
                     }
-                    return null;
-                }).toList();
-
-        return serieDtoList;
+                    else {
+                        Year anoUnico = Year.parse(ano.substring(0, Math.min(ano.length(), 4)));
+                        return anoUnico.equals(anoMaximo) || anoUnico.isBefore(anoMaximo);
+                    }
+                })
+                .map(SerieDto::new)
+                .toList();
     }
 
-    public List<SerieDto> filtrarPorAnoMinimo(Year ano) {
-        List<SerieDto> serieDtoList = new ArrayList<>();
+    public List<SerieDto> filtrarPorAnoMinimo(Year anoMinimo) {
+        return serieRepository.findAll().stream()
+                .filter(serie -> {
+                    String ano = serie.getAno();
+                    if (ano == null || ano.isBlank()) return false;
 
-       serieRepository.findAll()
-                .stream()
-                .map(serie -> {
-                    Year anoFinalSerie = Year.parse(serie.getAno().substring(5, 9));
-                    if( anoFinalSerie.equals(ano) || anoFinalSerie.isAfter(ano) ) {
-                        serieDtoList.add(new SerieDto(serie));
+                    if (ano.length() >= 9 && ano.contains("-")) {
+                        Year anoFim = Year.parse(ano.substring(5, 9));
+                        return anoFim.equals(anoMinimo) || anoFim.isAfter(anoMinimo);
                     }
-                    return null;
-                }).toList();
-
-        return serieDtoList;
+                    else {
+                        Year anoUnico = Year.parse(ano.substring(0, Math.min(ano.length(), 4)));
+                        return anoUnico.equals(anoMinimo) || anoUnico.isAfter(anoMinimo);
+                    }
+                })
+                .map(SerieDto::new)
+                .toList();
     }
 
     public List<SerieDto> verTodasSeries() {
