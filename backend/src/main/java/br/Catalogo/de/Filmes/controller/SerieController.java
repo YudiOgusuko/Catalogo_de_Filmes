@@ -1,20 +1,31 @@
 package br.Catalogo.de.Filmes.controller;
 
+import java.time.Year;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import br.Catalogo.de.Filmes.dto.SerieDto;
 import br.Catalogo.de.Filmes.dto.SerieEpisodioDto;
 import br.Catalogo.de.Filmes.dto.SerieEpisodiosTemporadaDto;
 import br.Catalogo.de.Filmes.dto.SerieTemporadaDto;
 import br.Catalogo.de.Filmes.dto.conteudosDados.ConteudoSearchDados;
 import br.Catalogo.de.Filmes.service.SerieService;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.Year;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -185,7 +196,7 @@ public class SerieController {
     @DeleteMapping("/delete")
     public ResponseEntity<String> deletarSerie(
             @RequestParam
-            @NotEmpty(message = "O nome das série não pode estar vazio.")
+            @NotEmpty(message = "O nome da série não pode estar vazio.")
             @Size(max = 41, message = "O nome da série não pode ultrapassar 41 caracteres.")
             String serie) {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(service.deletarSerie(serie));
