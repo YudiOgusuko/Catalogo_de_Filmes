@@ -1,5 +1,17 @@
 package br.Catalogo.de.Filmes.service;
 
+import java.time.Year;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+
 import br.Catalogo.de.Filmes.dto.SerieDto;
 import br.Catalogo.de.Filmes.dto.SerieEpisodioDto;
 import br.Catalogo.de.Filmes.dto.SerieEpisodiosTemporadaDto;
@@ -16,18 +28,6 @@ import br.Catalogo.de.Filmes.model.Serie;
 import br.Catalogo.de.Filmes.model.Temporadas;
 import br.Catalogo.de.Filmes.repository.ISerieRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.method.annotation.HandlerMethodValidationException;
-
-import java.time.Year;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -177,40 +177,6 @@ public class SerieService {
     public List<SerieDto> filtrarPorAvaliacaoMinima(Double avaliacao) {
         return serieRepository.findByAvaliacaoMinima(avaliacao).stream().map(SerieDto::new).toList();
     }
-
-//    public List<SerieDto> filtrarPorAnoMaximo(Year ano) {
-//        List<SerieDto> serieDtoList = new ArrayList<>();
-//
-//        serieRepository.findAll()
-//                .stream()
-//                .map(serie -> {
-//                    Year anoUnicoSerie = Year.parse(serie.getAno().substring(0, 4));
-//                    Year anoFinalSerie = Year.parse(serie.getAno().substring(5, 9));
-//                    if(anoFinalSerie.equals(ano) || anoFinalSerie.isBefore(ano) || (anoUnicoSerie.equals(ano) || anoUnicoSerie.isBefore(ano))){
-//                        serieDtoList.add(new SerieDto(serie));
-//                    }
-//                    return null;
-//                }).toList();
-//
-//        return serieDtoList;
-//    }
-//
-//    public List<SerieDto> filtrarPorAnoMinimo(Year ano) {
-//        List<SerieDto> serieDtoList = new ArrayList<>();
-//
-//       serieRepository.findAll()
-//                .stream()
-//                .map(serie -> {
-//                    Year anoUnicoSerie = Year.parse(serie.getAno().substring(0, 4));
-//                    Year anoFinalSerie = Year.parse(serie.getAno().substring(5, 9));
-//                    if(anoFinalSerie.equals(ano) || anoFinalSerie.isAfter(ano) || (anoUnicoSerie.equals(ano) || anoUnicoSerie.isBefore(ano))) {
-//                        serieDtoList.add(new SerieDto(serie));
-//                    }
-//                    return null;
-//                }).toList();
-//
-//        return serieDtoList;
-//    }
 
     public List<SerieDto> filtrarPorAnoMaximo(Year anoMaximo) {
         return serieRepository.findAll().stream()

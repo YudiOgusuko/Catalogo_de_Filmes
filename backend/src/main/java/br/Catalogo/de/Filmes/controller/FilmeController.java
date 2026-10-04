@@ -1,17 +1,28 @@
 package br.Catalogo.de.Filmes.controller;
 
-import br.Catalogo.de.Filmes.dto.FilmeDto;
-import br.Catalogo.de.Filmes.dto.conteudosDados.ConteudoSearchDados;
-import br.Catalogo.de.Filmes.service.FilmeService;
-import jakarta.validation.constraints.*;
-import lombok.RequiredArgsConstructor;
+import java.time.Year;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Year;
-import java.util.List;
+import br.Catalogo.de.Filmes.dto.FilmeDto;
+import br.Catalogo.de.Filmes.dto.conteudosDados.ConteudoSearchDados;
+import br.Catalogo.de.Filmes.service.FilmeService;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +35,7 @@ public class FilmeController {
     @GetMapping("/tituloIgual")
     public ResponseEntity<ConteudoSearchDados> tituloIgual(
             @RequestParam
-            @NotEmpty(message = "O nome do filme não pode esta vazia.")
+            @NotEmpty(message = "O nome do filme não pode estar vazio.")
             @Size(max = 41, message = "O nome do filme não pode ultrapassar 41 caracteres.")
             String filme) {
         return ResponseEntity.ok().body(service.tituloIgual(filme));
@@ -33,7 +44,7 @@ public class FilmeController {
     @GetMapping("/buscar")
     public ResponseEntity<List<FilmeDto>> buscarFilme(
             @RequestParam
-            @NotEmpty(message = "O nome do filme não pode esta vazia.")
+            @NotEmpty(message = "O nome do filme não pode estar vazio.")
             @Size(max = 41, message = "O nome do filme não pode ultrapassar 41 caracteres.")
             String filme) {
         return ResponseEntity.ok().body(service.buscarFilme(filme));
@@ -52,7 +63,7 @@ public class FilmeController {
     public ResponseEntity<List<FilmeDto>> buscarFilmePorAtor(
             @RequestParam
             @NotEmpty(message = "O nome do(a) ator(a) não pode estar vazio.")
-            @Size(max = 30, message = "O nome do(a) ator(a) não pode ultrapassar 12 caracteres.")
+            @Size(max = 30, message = "O nome do(a) ator(a) não pode ultrapassar 30 caracteres.")
             String ator) {
         return ResponseEntity.ok().body(service.buscarFilmePorAtor(ator));
     }
@@ -85,8 +96,8 @@ public class FilmeController {
     @GetMapping("/filtrarPorAnoMaximo")
     public ResponseEntity<List<FilmeDto>> filtrarPorAnoMaximo(
             @RequestParam
-            @NotNull(message = "O ano não pode ser nula.")
-            @PastOrPresent(message = "O ano não pode ser maio que o ano atual.")
+            @NotNull(message = "O ano não pode ser nulo.")
+            @PastOrPresent(message = "O ano não pode ser maior que o ano atual.")
             Year ano) {
         return ResponseEntity.ok().body(service.filtrarPorAnoMaximo(ano));
     }
@@ -94,8 +105,8 @@ public class FilmeController {
     @GetMapping("/filtrarPorAnoMinimo")
     public ResponseEntity<List<FilmeDto>> filtrarPorAnoMinimo(
             @RequestParam
-            @NotNull(message = "A avaliação não pode ser nula.")
-            @PastOrPresent(message = "O ano não pode ser maio que o ano atual.")
+            @NotNull(message = "A avaliação não pode ser nulo.")
+            @PastOrPresent(message = "O ano não pode ser maior que o ano atual.")
             Year ano) {
         return ResponseEntity.ok().body(service.filtrarPorAnoMinimo(ano));
     }
@@ -108,7 +119,7 @@ public class FilmeController {
     @PostMapping("/add")
     public ResponseEntity<FilmeDto> adicionarFilme(
             @RequestParam
-            @NotEmpty(message = "O nome do filme não pode esta vazia.")
+            @NotEmpty(message = "O nome do filme não pode estar vazio.")
             @Size(max = 41, message = "O nome do filme não pode ultrapassar 41 caracteres.")
             String filme) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.adicionarFilme(filme));
@@ -117,7 +128,7 @@ public class FilmeController {
     @DeleteMapping("/delete")
     public ResponseEntity<String> deletarFilme(
             @RequestParam
-            @NotEmpty(message = "O nome do filme não pode esta vazia.")
+            @NotEmpty(message = "O nome do filme não pode estar vazio.")
             @Size(max = 41, message = "O nome do filme não pode ultrapassar 41 caracteres.")
             String filme) {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(service.deletarFilme(filme));
