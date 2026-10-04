@@ -27,7 +27,7 @@ public class SerieController {
     @GetMapping("/tituloIgual")
     public ResponseEntity<ConteudoSearchDados> tituloIgual(
             @RequestParam
-            @NotEmpty(message = "O nome da série não pode estar vazia.")
+            @NotEmpty(message = "O nome da série não pode estar vazio.")
             @Size(max = 74, message = "O nome da série pode ter no máximo, 74 caracteres.")
             String serie) {
         return ResponseEntity.ok().body(service.tituloIgual(serie));
@@ -36,7 +36,7 @@ public class SerieController {
     @GetMapping("/buscar")
     public ResponseEntity<List<SerieDto>> buscarSerie(
             @RequestParam
-            @NotEmpty(message = "O nome da série não pode estar vazia.")
+            @NotEmpty(message = "O nome da série não pode estar vazio.")
             @Size(max = 74, message = "O nome da série pode ter no máximo 74 caracteres.")
             String serie) {
         return ResponseEntity.ok().body(service.buscarSerie(serie));
@@ -46,7 +46,7 @@ public class SerieController {
     public ResponseEntity<List<SerieDto>> buscarSeriePorGenero(
             @RequestParam
             @NotEmpty(message = "O gênero não pode estar vazio.")
-            @Size(max = 12, message = "O gênero do filme não pode ultrapassar 12 caracteres.")
+            @Size(max = 12, message = "O gênero da série não pode ultrapassar 12 caracteres.")
             String genero) {
         return ResponseEntity.ok().body(service.buscarSeriePorGenero(genero));
     }
@@ -55,7 +55,7 @@ public class SerieController {
     public ResponseEntity<List<SerieDto>> buscarSeriePorAtor(
             @RequestParam
             @NotEmpty(message = "O nome do(a) ator(a) não pode estar vazio.")
-            @Size(max = 30, message = "O nome do(a) ator(a) não pode ultrapassar 12 caracteres.")
+            @Size(max = 30, message = "O nome do(a) ator(a) não pode ultrapassar 30 caracteres.")
             String ator) {
         return ResponseEntity.ok().body(service.buscarSeriePorAtor(ator));
     }
@@ -68,8 +68,8 @@ public class SerieController {
     @GetMapping("/top5Episodios")
     public ResponseEntity<List<SerieEpisodiosTemporadaDto>> top5EpisodiosDaSerie(
             @RequestParam
-            @NotEmpty(message = "O nome da série não pode estar vazia.")
-            @Size(max = 30, message = "O nome da série pode ter no máximo 74 caracteres.")
+            @NotEmpty(message = "O nome da série não pode estar vazio.")
+            @Size(max = 30, message = "O nome da série pode ter no máximo 30 caracteres.")
             String serie){
         return ResponseEntity.ok().body(service.top5EpisodiosDaSerie(serie));
     }
@@ -77,13 +77,13 @@ public class SerieController {
     @GetMapping("/pegarTemporada")
     public ResponseEntity<SerieTemporadaDto> buscarTemporada(
             @RequestParam
-            @NotEmpty(message = "O nome da série não pode estar vazia.")
+            @NotEmpty(message = "O nome da série não pode estar vazio.")
             @Size(max = 74, message = "O nome da série pode ter no máximo, 74 caracteres.")
             String serie,
 
             @RequestParam
             @NotNull(message = "A temporada não pode ser nula.")
-            @Positive(message = "O número deve ser positivo.")
+            @Positive(message = "O número da temporada deve ser positivo.")
             @Max(value = 60, message = "O número máximo de temporada é 60")
             Integer temporada) {
         return ResponseEntity.ok().body(service.buscarTemporada(serie, temporada));
@@ -92,19 +92,19 @@ public class SerieController {
     @GetMapping("/pegarEpisodio")
     public ResponseEntity<SerieEpisodioDto> buscarEpisodio(
             @RequestParam
-            @NotEmpty(message = "O nome da série não pode estar vazia.")
+            @NotEmpty(message = "O nome da série não pode estar vazio.")
             @Size(max = 74, message = "O nome da série pode ter no máximo, 74 caracteres.")
             String serie,
 
             @RequestParam
             @NotNull(message = "A temporada não pode ser nula.")
-            @Positive(message = "O número deve ser positivo.")
+            @Positive(message = "O número da temporada deve ser positivo.")
             @Max(value = 60, message = "O número máximo de temporada é 60")
             Integer temporada,
 
             @RequestParam
-            @NotNull(message = "O episódios  não pode ser nulo.")
-            @Positive(message = "O número deve ser positivo.")
+            @NotNull(message = "O episódio não pode ser nulo.")
+            @Positive(message = "O número do episódio deve ser positivo.")
             @Max(value = 195, message = "O número máximo de episódios é 195.")
             Integer episodio) {
         return ResponseEntity.ok().body(service.buscarEpisodio(serie, temporada, episodio));
@@ -114,7 +114,7 @@ public class SerieController {
     public ResponseEntity<List<SerieDto>> filtrarPorTemporadaMaxima(
             @RequestParam
             @NotNull(message = "A temporada não pode ser nula.")
-            @Positive(message = "O número deve ser positivo.")
+            @Positive(message = "O número da temporada deve ser positivo.")
             @Max(value = 60, message = "O número máximo de temporada é 60")
             Integer temporada) {
         return ResponseEntity.ok().body(service. filtrarPorTemporadaMaxima(temporada));
@@ -124,7 +124,7 @@ public class SerieController {
     public ResponseEntity<List<SerieDto>> filtrarPorTemporadaMinima(
             @RequestParam
             @NotNull(message = "A temporada não pode ser nula.")
-            @Positive(message = "O número deve ser positivo.")
+            @Positive(message = "O número da temporada deve ser positivo.")
             @Max(value = 60, message = "O número máximo de temporada é 60")
             Integer temporada) {
         return ResponseEntity.ok().body(service. filtrarPorTemporadaMinima(temporada));
@@ -153,8 +153,8 @@ public class SerieController {
     @GetMapping("filtrarPorAnoMaximo")
     public ResponseEntity<List<SerieDto>> filtrarPorAnoMaximo(
             @RequestParam
-            @NotNull(message = "O ano não pode ser nula.")
-            @PastOrPresent(message = "O ano não pode ser maio que o ano atual.")
+            @NotNull(message = "O ano não pode ser nulo.")
+            @PastOrPresent(message = "O ano não pode ser maior que o ano atual.")
             Year ano) {
         return ResponseEntity.ok().body(service. filtrarPorAnoMaximo(ano));
     }
@@ -162,8 +162,8 @@ public class SerieController {
     @GetMapping("filtrarPorAnoMinimo")
     public ResponseEntity<List<SerieDto>> filtrarPorAnoMinimo(
             @RequestParam
-            @NotNull(message = "A avaliação não pode ser nula.")
-            @PastOrPresent(message = "O ano não pode ser maio que o ano atual.")
+            @NotNull(message = "O ano não pode ser nulo.")
+            @PastOrPresent(message = "O ano não pode ser maior que o ano atual.")
             Year ano) {
         return ResponseEntity.ok().body(service. filtrarPorAnoMinimo(ano));
     }
@@ -176,8 +176,8 @@ public class SerieController {
     @PostMapping("/add")
     public ResponseEntity<SerieDto> adicionarSerie(
             @RequestParam
-            @NotEmpty(message = "O nome do filme não pode esta vazia.")
-            @Size(max = 41, message = "O nome do filme não pode ultrapassar 41 caracteres.")
+            @NotEmpty(message = "O nome da série não pode esta vazio.")
+            @Size(max = 41, message = "O nome da série não pode ultrapassar 41 caracteres.")
             String serie) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.adicionarSerie(serie));
     }
@@ -185,8 +185,8 @@ public class SerieController {
     @DeleteMapping("/delete")
     public ResponseEntity<String> deletarSerie(
             @RequestParam
-            @NotEmpty(message = "O nome do filme não pode esta vazia.")
-            @Size(max = 41, message = "O nome do filme não pode ultrapassar 41 caracteres.")
+            @NotEmpty(message = "O nome das série não pode estar vazio.")
+            @Size(max = 41, message = "O nome da série não pode ultrapassar 41 caracteres.")
             String serie) {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(service.deletarSerie(serie));
     }

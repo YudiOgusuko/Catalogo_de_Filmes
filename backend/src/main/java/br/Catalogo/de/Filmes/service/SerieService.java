@@ -178,40 +178,6 @@ public class SerieService {
         return serieRepository.findByAvaliacaoMinima(avaliacao).stream().map(SerieDto::new).toList();
     }
 
-//    public List<SerieDto> filtrarPorAnoMaximo(Year ano) {
-//        List<SerieDto> serieDtoList = new ArrayList<>();
-//
-//        serieRepository.findAll()
-//                .stream()
-//                .map(serie -> {
-//                    Year anoUnicoSerie = Year.parse(serie.getAno().substring(0, 4));
-//                    Year anoFinalSerie = Year.parse(serie.getAno().substring(5, 9));
-//                    if(anoFinalSerie.equals(ano) || anoFinalSerie.isBefore(ano) || (anoUnicoSerie.equals(ano) || anoUnicoSerie.isBefore(ano))){
-//                        serieDtoList.add(new SerieDto(serie));
-//                    }
-//                    return null;
-//                }).toList();
-//
-//        return serieDtoList;
-//    }
-//
-//    public List<SerieDto> filtrarPorAnoMinimo(Year ano) {
-//        List<SerieDto> serieDtoList = new ArrayList<>();
-//
-//       serieRepository.findAll()
-//                .stream()
-//                .map(serie -> {
-//                    Year anoUnicoSerie = Year.parse(serie.getAno().substring(0, 4));
-//                    Year anoFinalSerie = Year.parse(serie.getAno().substring(5, 9));
-//                    if(anoFinalSerie.equals(ano) || anoFinalSerie.isAfter(ano) || (anoUnicoSerie.equals(ano) || anoUnicoSerie.isBefore(ano))) {
-//                        serieDtoList.add(new SerieDto(serie));
-//                    }
-//                    return null;
-//                }).toList();
-//
-//        return serieDtoList;
-//    }
-
     public List<SerieDto> filtrarPorAnoMaximo(Year anoMaximo) {
         return serieRepository.findAll().stream()
                 .filter(serie -> {
